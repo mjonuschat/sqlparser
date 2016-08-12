@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.5/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         backupGlobals="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutTodoAnnotatedTests="true"
+         colors="true"
+         verbose="false">
+    <testsuite name="SqlParser">
+        <directory suffix="Test.php">./Tests/Unit/</directory>
+        <exclude>vendor/</exclude>
+    </testsuite>
+
+    <filter>
+        <blacklist>
+            <directory>vendor/</directory>
+        </blacklist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">Classes</directory>
+        </whitelist>
+    </filter>
+</phpunit>

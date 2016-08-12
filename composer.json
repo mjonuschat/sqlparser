@@ -1,0 +1,35 @@
+{
+  "name": "mjonuschat/sqlparser",
+  "type": "library",
+  "description": "Doctrine Lexer based parser for MySQL CREATE TABLE statements",
+  "homepage": "https://github.com/yabawock/sqlparser/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Morton Jonuschat",
+      "email": "m.jonuschat@mojocode.de"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "doctrine/lexer": "^1.0",
+    "doctrine/common": "^2.6"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "MojoCode\\SqlParser\\": [
+        "Classes/"
+      ]
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MojoCode\\SqlParser\\Tests\\": [
+        "Tests/"
+      ]
+    }
+  }
+}
