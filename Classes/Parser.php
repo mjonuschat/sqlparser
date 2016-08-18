@@ -401,10 +401,10 @@ class Parser
                 $definitionItem = $this->createIndexDefinitionItem();
                 break;
             case Lexer::T_CONSTRAINT:
-                $this->semanticalError('CONSTRAINT Definition not supported');
+                $this->semanticalError('CONSTRAINT [symbol] index definition part not supported');
                 break;
             case Lexer::T_CHECK:
-                $this->semanticalError('CHECK Definition not supported');
+                $this->semanticalError('CHECK (expr) create definition not supported');
                 break;
             default:
                 $definitionItem = $this->createColumnDefinitionItem();
@@ -416,12 +416,185 @@ class Parser
     /**
      * Parses an index definition item contained in the create definition
      *
-     * @todo Implement
      * @return \MojoCode\SqlParser\AST\CreateIndexDefinitionItem
+     * @throws \MojoCode\SqlParser\StatementException
      */
     protected function createIndexDefinitionItem(): AST\CreateIndexDefinitionItem
     {
-        return new AST\CreateIndexDefinitionItem();
+        $indexName = null;
+        $isPrimary = false;
+        $isFulltext = false;
+        $isSpatial = false;
+        $isUnique = false;
+        $indexDefinition = new AST\CreateIndexDefinitionItem();
+
+        switch ($this->lexer->lookahead['type']) {
+            case Lexer::T_PRIMARY:
+                $this->match(Lexer::T_PRIMARY);
+                // KEY is a required keyword for PRIMARY index
+                $this->match(Lexer::T_KEY);
+                $isPrimary = true;
+                break;
+            case Lexer::T_KEY:
+                // Plain index, no special configuration
+                $this->match(Lexer::T_KEY);
+                break;
+            case Lexer::T_INDEX:
+                // Plain index, no special configuration
+                $this->match(Lexer::T_INDEX);
+                break;
+            case Lexer::T_UNIQUE:
+                $this->match(Lexer::T_UNIQUE);
+                // INDEX|KEY are optional keywords for UNIQUE index
+                if ($this->lexer->isNextTokenAny([Lexer::T_INDEX, Lexer::T_KEY])) {
+                    $this->lexer->moveNext();
+                }
+                $isUnique = true;
+                break;
+            case Lexer::T_FULLTEXT:
+                $this->match(Lexer::T_FULLTEXT);
+                // INDEX|KEY are optional keywords for FULLTEXT index
+                if ($this->lexer->isNextTokenAny([Lexer::T_INDEX, Lexer::T_KEY])) {
+                    $this->lexer->moveNext();
+                }
+                $isFulltext = true;
+                break;
+            case Lexer::T_SPATIAL:
+                $this->match(Lexer::T_SPATIAL);
+                // INDEX|KEY are optional keywords for SPATIAL index
+                if ($this->lexer->isNextTokenAny([Lexer::T_INDEX, Lexer::T_KEY])) {
+                    $this->lexer->moveNext();
+                }
+                $isSpatial = true;
+                break;
+            default:
+                $this->syntaxError('PRIMARY, KEY, INDEX, UNIQUE, FULLTEXT or SPATIAL');
+        }
+
+        // PRIMARY KEY has no name in MySQL
+        if (!$indexDefinition->isPrimary) {
+            $indexName = $this->indexName();
+        }
+
+        $indexDefinition = new AST\CreateIndexDefinitionItem(
+            $indexName,
+            $isPrimary,
+            $isUnique,
+            $isSpatial,
+            $isFulltext
+        );
+
+        // FULLTEXT and SPATIAL indexes can not have a type definiton
+        if (!$isFulltext && !$isSpatial) {
+            $indexDefinition->indexType = $this->indexType();
+        }
+
+        $this->match(Lexer::T_OPEN_PARENTHESIS);
+
+        $indexDefinition->columns[] = $this->indexColumnName();
+
+        while ($this->lexer->isNextToken(Lexer::T_COMMA)) {
+            $this->match(Lexer::T_COMMA);
+            $indexDefinition->columns[] = $this->indexColumnName();
+        }
+
+        $this->match(Lexer::T_CLOSE_PARENTHESIS);
+
+        $indexDefinition->options = $this->indexOptions();
+
+        return $indexDefinition;
+    }
+
+    /**
+     * Return the name of an index  . No name has been supplied if the next token is USING
+     * which defines the index type.
+     *
+     * @return AST\Identifier
+     * @throws \MojoCode\SqlParser\StatementException
+     */
+    public function indexName(): AST\Identifier
+    {
+        $indexName = new AST\Identifier(null);
+        if (!$this->lexer->isNextTokenAny([Lexer::T_USING, Lexer::T_OPEN_PARENTHESIS])) {
+            $indexName = $this->schemaObjectName();
+        }
+
+        return $indexName;
+    }
+
+    /**
+     * IndexType ::= USING { BTREE | HASH }
+     *
+     * @return string
+     * @throws \MojoCode\SqlParser\StatementException
+     */
+    public function indexType(): string
+    {
+        $indexType = '';
+        if (!$this->lexer->isNextToken(Lexer::T_USING)) {
+            return $indexType;
+        }
+
+        $this->match(Lexer::T_USING);
+
+        switch ($this->lexer->lookahead['type']) {
+            case Lexer::T_BTREE:
+                $this->match(Lexer::T_BTREE);
+                $indexType = 'BTREE';
+                break;
+            case Lexer::T_HASH:
+                $this->match(Lexer::T_HASH);
+                $indexType = 'HASH';
+                break;
+            default:
+                $this->syntaxError('BTREE or HASH');
+        }
+
+        return $indexType;
+    }
+
+    /**
+     * IndexOptions ::=  KEY_BLOCK_SIZE [=] value
+     *  | index_type
+     *  | WITH PARSER parser_name
+     *  | COMMENT 'string'
+     *
+     * @return array
+     * @throws \MojoCode\SqlParser\StatementException
+     */
+    public function indexOptions(): array
+    {
+        $options = [];
+
+        while ($this->lexer->lookahead && !$this->lexer->isNextTokenAny([Lexer::T_COMMA, Lexer::T_CLOSE_PARENTHESIS])) {
+            switch ($this->lexer->lookahead['type']) {
+                case Lexer::T_KEY_BLOCK_SIZE:
+                    $this->match(Lexer::T_KEY_BLOCK_SIZE);
+                    if ($this->lexer->isNextToken(Lexer::T_EQUALS)) {
+                        $this->match(Lexer::T_EQUALS);
+                    }
+                    $this->lexer->moveNext();
+                    $options['key_block_size'] = (int)$this->lexer->token['value'];
+                    break;
+                case Lexer::T_USING:
+                    $options['index_type'] = $this->indexType();
+                    break;
+                case Lexer::T_WITH:
+                    $this->match(Lexer::T_WITH);
+                    $this->match(Lexer::T_PARSER);
+                    $options['parser'] = $this->schemaObjectName();
+                    break;
+                case Lexer::T_COMMENT:
+                    $this->match(Lexer::T_COMMENT);
+                    $this->match(Lexer::T_STRING);
+                    $options['comment'] = $this->lexer->token['value'];
+                    break;
+                default:
+                    $this->syntaxError('KEY_BLOCK_SIZE, USING, WITH PARSER or COMMENT');
+            }
+        }
+
+        return $options;
     }
 
     /**

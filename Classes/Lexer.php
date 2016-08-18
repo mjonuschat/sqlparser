@@ -123,6 +123,12 @@ class Lexer extends \Doctrine\Common\Lexer
     const T_CASCADE = 340;
     const T_NO = 341;
     const T_ACTION = 342;
+    const T_USING = 343;
+    const T_BTREE = 344;
+    const T_HASH = 345;
+    const T_KEY_BLOCK_SIZE = 346;
+    const T_WITH = 347;
+    const T_PARSER = 348;
 
     /**
      * Creates a new statement scanner object.

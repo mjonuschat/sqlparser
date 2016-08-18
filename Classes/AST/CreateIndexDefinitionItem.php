@@ -18,8 +18,85 @@ namespace MojoCode\SqlParser\AST;
 
 class CreateIndexDefinitionItem extends AbstractCreateDefinitionItem
 {
-    public function __construct()
-    {
-        throw new \RuntimeException('Not implemented yet');
+    /**
+     * @var
+     */
+    public $indexName = '';
+
+    /**
+     * Create the primary key
+     *
+     * @var bool
+     */
+    public $isPrimary = false;
+
+    /**
+     * Create a unique index
+     *
+     * @var bool
+     */
+    public $isUnique = false;
+
+    /**
+     * Create a fulltext index
+     *
+     * @var bool
+     */
+    public $isFulltext = false;
+
+    /**
+     * Create a spatial (geo) index
+     *
+     * @var bool
+     */
+    public $isSpatial = false;
+
+    /**
+     * Use a special index type (MySQL: BTREE | HASH)
+     *
+     * @var string
+     */
+    public $indexType = '';
+
+    /**
+     * The index name
+     *
+     * @var string
+     */
+    public $name = '';
+
+    /**
+     * @var IndexColumnName[]
+     */
+    public $columns = [];
+
+    /**
+     * Index options KEY_BLOCK_SIZE, USING, WITH PARSER or COMMENT
+     *
+     * @var array
+     */
+    public $options = [];
+
+    /**
+     * CreateIndexDefinitionItem constructor.
+     *
+     * @param Identifier $indexName
+     * @param bool $isPrimary
+     * @param bool $isUnique
+     * @param bool $isSpatial
+     * @param bool $isFulltext
+     */
+    public function __construct(
+        Identifier $indexName = null,
+        bool $isPrimary = false,
+        bool $isUnique = false,
+        bool $isSpatial = false,
+        bool $isFulltext = false
+    ) {
+        $this->indexName = $indexName;
+        $this->isPrimary = $isPrimary;
+        $this->isUnique = $isUnique;
+        $this->isSpatial = $isSpatial;
+        $this->isFulltext = $isFulltext;
     }
 }
