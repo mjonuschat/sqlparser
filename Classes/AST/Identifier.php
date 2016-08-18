@@ -18,13 +18,18 @@ namespace MojoCode\SqlParser\AST;
 
 class Identifier
 {
+    /**
+     * @var string
+     */
+    public $schemaObjectName;
 
     /**
      * Identifier constructor.
      *
-     * @param $schemaObjectName
+     * @param string $schemaObjectName
      */
-    public function __construct($schemaObjectName)
+    public function __construct(string $schemaObjectName = null)
     {
+        $this->schemaObjectName = (string)$schemaObjectName;
     }
 }

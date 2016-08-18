@@ -18,14 +18,25 @@ namespace MojoCode\SqlParser\AST;
 
 class CreateTableClause
 {
+    /**
+     * @var \MojoCode\SqlParser\AST\Identifier
+     */
+    public $tableName;
+
+    /**
+     * @var bool
+     */
+    public $isTemporary;
 
     /**
      * CreateTableClause constructor.
      *
-     * @param $tableName
+     * @param Identifier $tableName
      * @param bool $isTemporary
      */
-    public function __construct($tableName, $isTemporary)
+    public function __construct(Identifier $tableName, bool $isTemporary = false)
     {
+        $this->tableName = $tableName;
+        $this->isTemporary = $isTemporary;
     }
 }

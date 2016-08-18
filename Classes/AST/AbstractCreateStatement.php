@@ -18,5 +18,4 @@ namespace MojoCode\SqlParser\AST;
 
 abstract class AbstractCreateStatement
 {
-
 }

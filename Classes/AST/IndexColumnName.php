@@ -19,6 +19,22 @@ namespace MojoCode\SqlParser\AST;
 class IndexColumnName
 {
     /**
+     * @var \MojoCode\SqlParser\AST\Identifier
+     */
+    public $columnName;
+
+    /**
+     * @var int
+     */
+    public $length;
+
+    /**
+     * @var string
+     */
+    public $direction;
+
+
+    /**
      * IndexColumnName constructor.
      *
      * @param \MojoCode\SqlParser\AST\Identifier $columnName
@@ -27,5 +43,8 @@ class IndexColumnName
      */
     public function __construct(Identifier $columnName, int $length, string $direction = null)
     {
+        $this->columnName = $columnName;
+        $this->length = $length;
+        $this->direction = $direction;
     }
 }

@@ -21,6 +21,16 @@ use MojoCode\SqlParser\AST\DataType\AbstractDataType;
 class CreateColumnDefinitionItem extends AbstractCreateDefinitionItem
 {
     /**
+     * @var \MojoCode\SqlParser\AST\Identifier
+     */
+    public $columnName;
+
+    /**
+     * @var \MojoCode\SqlParser\AST\DataType\AbstractDataType
+     */
+    public $dataType;
+
+    /**
      * Allow NULL values
      *
      * @var bool
@@ -103,5 +113,7 @@ class CreateColumnDefinitionItem extends AbstractCreateDefinitionItem
      */
     public function __construct(Identifier $columnName, AbstractDataType $dataType)
     {
+        $this->columnName = $columnName;
+        $this->dataType = $dataType;
     }
 }

@@ -24,6 +24,16 @@ namespace MojoCode\SqlParser\AST;
 class CreateTableStatement extends AbstractCreateStatement
 {
     /**
+     * @var \MojoCode\SqlParser\AST\CreateTableClause
+     */
+    public $createTableClause;
+
+    /**
+     * @var \MojoCode\SqlParser\AST\CreateDefinition
+     */
+    public $createDefinition;
+
+    /**
      * CreateTableStatement constructor.
      *
      * @param \MojoCode\SqlParser\AST\CreateTableClause $createTableClause
@@ -31,5 +41,7 @@ class CreateTableStatement extends AbstractCreateStatement
      */
     public function __construct(CreateTableClause $createTableClause, CreateDefinition $createDefinition)
     {
+        $this->createTableClause = $createTableClause;
+        $this->createDefinition = $createDefinition;
     }
 }

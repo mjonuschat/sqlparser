@@ -18,13 +18,18 @@ namespace MojoCode\SqlParser\AST;
 
 class CreateDefinition
 {
+    /**
+     * @var array
+     */
+    public $items;
 
     /**
      * CreateDefinition constructor.
      *
-     * @param array $createDefinitions
+     * @param array $items
      */
-    public function __construct($createDefinitions)
+    public function __construct(array $items)
     {
+        $this->items = $items;
     }
 }

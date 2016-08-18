@@ -38,4 +38,25 @@ class ReferenceDefinition
      * @var string
      */
     public $onUpdate;
+    /**
+     * @var \MojoCode\SqlParser\AST\Identifier
+     */
+    public $tableName;
+
+    /**
+     * @var IndexColumnName[]
+     */
+    public $columnNames;
+
+    /**
+     * ReferenceDefinition constructor.
+     *
+     * @param \MojoCode\SqlParser\AST\Identifier $tableName
+     * @param array $columnNames
+     */
+    public function __construct(Identifier $tableName, array $columnNames)
+    {
+        $this->tableName = $tableName;
+        $this->columnNames = $columnNames;
+    }
 }
