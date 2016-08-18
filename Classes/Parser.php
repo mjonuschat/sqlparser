@@ -969,17 +969,23 @@ class Parser
     protected function columnDefaultValue()
     {
         $this->match(Lexer::T_DEFAULT);
+        $value = null;
 
         switch ($this->lexer->lookahead['type']) {
             case Lexer::T_INTEGER:
+                $value = (int)$this->lexer->lookahead['value'];
                 break;
             case Lexer::T_FLOAT:
+                $value = (float)$this->lexer->lookahead['value'];
                 break;
             case Lexer::T_STRING:
+                $value = (string)$this->lexer->lookahead['value'];
                 break;
             case Lexer::T_CURRENT_TIMESTAMP:
+                $value = 'CURRENT_TIMESTAMP';
                 break;
             case Lexer::T_NULL:
+                $value = null;
                 break;
             default:
                 $this->syntaxError('String, Integer, Float, NULL or CURRENT_TIMESTAMP');
@@ -987,7 +993,7 @@ class Parser
 
         $this->lexer->moveNext();
 
-        return $this->lexer->token['value'];
+        return $value;
     }
 
     /**
