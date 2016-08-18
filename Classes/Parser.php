@@ -717,7 +717,7 @@ class Parser
                         $columnDefinitionItem->storage = 'memory';
                         $this->match(Lexer::T_MEMORY);
                     } elseif ($this->lexer->isNextToken(Lexer::T_DISK)) {
-                        $columnDefinitionItem->columnFormat = 'disk';
+                        $columnDefinitionItem->storage = 'disk';
                         $this->match(Lexer::T_DISK);
                     } else {
                         $this->match(Lexer::T_DEFAULT);
