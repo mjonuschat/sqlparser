@@ -19,11 +19,17 @@ namespace MojoCode\SqlParser\AST\DataType;
 class TextDataType extends AbstractDataType
 {
     /**
+     * @var array
+     */
+    public $options;
+
+    /**
      * TextDataType constructor.
      *
-     * @param array $characterDataTypeOptions
+     * @param array $options
      */
-    public function __construct($characterDataTypeOptions)
+    public function __construct(array $options)
     {
+        $this->options = $options;
     }
 }

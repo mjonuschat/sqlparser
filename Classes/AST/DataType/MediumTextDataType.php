@@ -19,11 +19,17 @@ namespace MojoCode\SqlParser\AST\DataType;
 class MediumTextDataType extends AbstractDataType
 {
     /**
+     * @var array
+     */
+    public $options;
+
+    /**
      * MediumTextDataType constructor.
      *
-     * @param array $characterDataTypeOptions
+     * @param array $options
      */
-    public function __construct($characterDataTypeOptions)
+    public function __construct(array $options)
     {
+        $this->options = $options;
     }
 }

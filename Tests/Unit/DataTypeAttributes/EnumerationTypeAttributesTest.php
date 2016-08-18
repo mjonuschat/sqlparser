@@ -36,15 +36,15 @@ class EnumerationTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'CHARACTER SET' => [
                 "ENUM('value1', 'value2') CHARACTER SET latin1",
-                null,
+                ['charset' => 'latin1', 'collation' => null],
             ],
             'COLLATE' => [
                 "SET('value1', 'value2')  COLLATE latin1_german1_ci",
-                null,
+                ['charset' => null, 'collation' => 'latin1_german1_ci'],
             ],
             'CHARACTER SET + COLLATE' => [
                 "SET('value1', 'value2') CHARACTER SET latin1 COLLATE latin1_german1_ci",
-                null,
+                ['charset' => 'latin1', 'collation' => 'latin1_german1_ci'],
             ],
         ];
     }
@@ -53,11 +53,12 @@ class EnumerationTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseEnumerationDataTypeAttributesProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param array $options
      */
-    public function canParseEnumerationDataTypeAttributes(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, array $options)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertSame($options, $subject->dataType->options);
     }
 }

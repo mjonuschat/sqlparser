@@ -36,23 +36,23 @@ class CharacterTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'BINARY' => [
                 'VARCHAR(255) BINARY',
-                null,
+                ['binary' => true, 'charset' => null, 'collation' => null],
             ],
             'CHARACTER SET' => [
                 'TEXT CHARACTER SET latin1',
-                null,
+                ['binary' => false, 'charset' => 'latin1', 'collation' => null],
             ],
             'COLLATE' => [
                 'CHAR(20) COLLATE latin1_german1_ci',
-                null,
+                ['binary' => false, 'charset' => null, 'collation' => 'latin1_german1_ci'],
             ],
             'CHARACTER SET + COLLATE' => [
                 'CHAR(20) CHARACTER SET latin1 COLLATE latin1_german1_ci',
-                null,
+                ['binary' => false, 'charset' => 'latin1', 'collation' => 'latin1_german1_ci'],
             ],
             'BINARY, CHARACTER SET + COLLATE' => [
                 'CHAR(20) BINARY CHARACTER SET latin1 COLLATE latin1_german1_ci',
-                null,
+                ['binary' => true, 'charset' => 'latin1', 'collation' => 'latin1_german1_ci'],
             ],
         ];
     }
@@ -61,11 +61,12 @@ class CharacterTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseCharacterDataTypeAttributesProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param array $options
      */
-    public function canParseCharacterDataTypeAttributes(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, array $options)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertSame($options, $subject->dataType->options);
     }
 }

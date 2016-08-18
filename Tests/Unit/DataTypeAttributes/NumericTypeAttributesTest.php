@@ -36,15 +36,15 @@ class NumericTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'UNSIGNED' => [
                 'INT(11) UNSIGNED',
-                null,
+                ['unsigned' => true, 'zerofill' => false],
             ],
             'ZEROFILL' => [
                 'INT(11) ZEROFILL',
-                null,
+                ['unsigned' => false, 'zerofill' => true],
             ],
             'UNSIGNED ZEROFILL' => [
                 'INT(11) UNSIGNED ZEROFILL',
-                null,
+                ['unsigned' => true, 'zerofill' => true],
             ]
         ];
     }
@@ -53,11 +53,12 @@ class NumericTypeAttributesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseNumericDataTypeAttributesProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param array $options
      */
-    public function canParseNumericDataTypeAttributes(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, array $options)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertSame($options, $subject->dataType->options);
     }
 }
