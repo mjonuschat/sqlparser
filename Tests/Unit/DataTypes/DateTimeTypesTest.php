@@ -16,7 +16,11 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\DateDataType;
+use MojoCode\SqlParser\AST\DataType\DateTimeDataType;
+use MojoCode\SqlParser\AST\DataType\TimeDataType;
+use MojoCode\SqlParser\AST\DataType\TimestampDataType;
+use MojoCode\SqlParser\AST\DataType\YearDataType;
 use MojoCode\SqlParser\StatementException;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
@@ -32,35 +36,43 @@ class DateTimeTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'DATE' => [
                 'DATE',
+                DateDataType::class,
                 null,
             ],
             'YEAR' => [
                 'YEAR',
+                YearDataType::class,
                 null,
             ],
             'TIME' => [
                 'TIME',
-                null,
+                TimeDataType::class,
+                0,
             ],
             'TIME with fractional second part' => [
                 'TIME(3)',
-                null,
+                TimeDataType::class,
+                3,
             ],
             'TIMESTAMP' => [
                 'TIMESTAMP',
-                null,
+                TimestampDataType::class,
+                0,
             ],
             'TIMESTAMP with fractional second part' => [
                 'TIMESTAMP(3)',
-                null,
+                TimestampDataType::class,
+                3,
             ],
             'DATETIME' => [
                 'DATETIME',
-                null,
+                DateTimeDataType::class,
+                0,
             ],
             'DATETIME with fractional second part' => [
                 'DATETIME(3)',
-                null,
+                DateTimeDataType::class,
+                3,
             ],
         ];
     }
@@ -69,12 +81,19 @@ class DateTimeTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseDateTimeTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param int $length
      */
-    public function canParseDateTimeType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className, int $length = null)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+
+        // DATE & YEAR don't support fractional second parts
+        if ($length !== null) {
+            $this->assertSame($length, $subject->dataType->length);
+        }
     }
 
     /**
@@ -86,8 +105,7 @@ class DateTimeTypesTestAbstract extends AbstractDataTypeBaseTestCase
         $this->expectExceptionMessageRegExp(
             '@Error: the fractional seconds part for TIME, DATETIME or TIMESTAMP columns must >= 0@'
         );
-        $subject = new Parser($this->createTableStatement('TIME(-1)'));
-        $subject->parse();
+        $this->createSubject('TIME(-1)');
     }
 
     /**
@@ -99,7 +117,6 @@ class DateTimeTypesTestAbstract extends AbstractDataTypeBaseTestCase
         $this->expectExceptionMessageRegExp(
             '@Error: the fractional seconds part for TIME, DATETIME or TIMESTAMP columns must <= 6@'
         );
-        $subject = new Parser($this->createTableStatement('DATETIME(7)'));
-        $subject->parse();
+        $this->createSubject('TIME(7)');
     }
 }

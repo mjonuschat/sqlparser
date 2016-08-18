@@ -16,7 +16,8 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\DecimalDataType;
+use MojoCode\SqlParser\AST\DataType\NumericDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 /**
@@ -34,27 +35,39 @@ class FixedPointTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'DECIMAL without precision and scale' => [
                 'DECIMAL',
+                DecimalDataType::class,
+                null,
                 null,
             ],
             'DECIMAL with precision' => [
                 'DECIMAL(5)',
+                DecimalDataType::class,
+                5,
                 null,
             ],
             'DECIMAL with precision and scale' => [
                 'DECIMAL(5,2)',
-                null,
+                DecimalDataType::class,
+                5,
+                2,
             ],
             'NUMERIC without length' => [
                 'NUMERIC',
+                NumericDataType::class,
+                null,
                 null,
             ],
             'NUMERIC with length' => [
                 'NUMERIC(5)',
+                NumericDataType::class,
+                5,
                 null,
             ],
             'NUMERIC with length and precision' => [
                 'NUMERIC(5,2)',
-                null,
+                NumericDataType::class,
+                5,
+                2,
             ],
         ];
     }
@@ -63,11 +76,20 @@ class FixedPointTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseFixedPointTypesProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param int $precision
+     * @param int $scale
      */
-    public function canParseFixedPointTypes(string $columnDefinition, $expectedResult)
-    {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+    public function canParseDataType(
+        string $columnDefinition,
+        string $className,
+        int $precision = null,
+        int $scale = null
+    ) {
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+        $this->assertSame($precision, $subject->dataType->precision);
+        $this->assertSame($scale, $subject->dataType->scale);
     }
 }

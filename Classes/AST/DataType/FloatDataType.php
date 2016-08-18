@@ -18,6 +18,20 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class FloatDataType extends AbstractDataType
 {
+    /**
+     * @var int
+     */
+    public $precision;
+
+    /**
+     * @var int
+     */
+    public $scale;
+
+    /**
+     * @var array
+     */
+    public $options;
 
     /**
      * FloatDataType constructor.
@@ -27,5 +41,8 @@ class FloatDataType extends AbstractDataType
      */
     public function __construct(array $dataTypeDecimals, array $dataTypeOptions)
     {
+        $this->precision = $dataTypeDecimals['length'] ?? null;
+        $this->scale = $dataTypeDecimals['decimals'] ?? null;
+        $this->options = $dataTypeOptions;
     }
 }

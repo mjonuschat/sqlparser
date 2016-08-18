@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class TinyTextDataType extends AbstractDataType
 {
-
     /**
      * TinyTextDataType constructor.
      *

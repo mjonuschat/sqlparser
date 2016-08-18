@@ -16,7 +16,7 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\JsonDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 class JsonAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
@@ -26,7 +26,8 @@ class JsonAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
      */
     public function canParseBitDataType()
     {
-        $subject = new Parser($this->createTableStatement('JSON'));
-        $subject->parse();
+        $subject = $this->createSubject('JSON');
+
+        $this->assertInstanceOf(JsonDataType::class, $subject->dataType);
     }
 }

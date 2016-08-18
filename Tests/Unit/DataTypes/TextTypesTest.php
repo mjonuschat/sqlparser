@@ -16,6 +16,10 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
+use MojoCode\SqlParser\AST\DataType\LongTextDataType;
+use MojoCode\SqlParser\AST\DataType\MediumTextDataType;
+use MojoCode\SqlParser\AST\DataType\TextDataType;
+use MojoCode\SqlParser\AST\DataType\TinyTextDataType;
 use MojoCode\SqlParser\Parser;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
@@ -35,19 +39,19 @@ class TextTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'TINYTEXT' => [
                 'TINYTEXT',
-                null,
+                TinyTextDataType::class,
             ],
             'TEXT' => [
                 'TEXT',
-                null,
+                TextDataType::class,
             ],
             'MEDIUMTEXT' => [
                 'MEDIUMTEXT',
-                null,
+                MediumTextDataType::class,
             ],
             'LONGTEXT' => [
                 'LONGTEXT',
-                null,
+                LongTextDataType::class,
             ],
         ];
     }
@@ -56,11 +60,12 @@ class TextTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseTextDataTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
      */
-    public function canParseTextDataType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
     }
 }

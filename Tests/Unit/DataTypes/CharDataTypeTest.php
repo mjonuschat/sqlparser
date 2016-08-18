@@ -17,10 +17,12 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  */
 
 use MojoCode\SqlParser\AST\DataType\BinaryDataType;
+use MojoCode\SqlParser\AST\DataType\CharDataType;
 use MojoCode\SqlParser\AST\DataType\VarBinaryDataType;
+use MojoCode\SqlParser\AST\DataType\VarCharDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
-class BinaryDataTypeTest extends AbstractDataTypeBaseTestCase
+class CharDataTypeTest extends AbstractDataTypeBaseTestCase
 {
     /**
      * Data provider for canParseBinaryDataType()
@@ -30,24 +32,24 @@ class BinaryDataTypeTest extends AbstractDataTypeBaseTestCase
     public function canParseBinaryDataTypeProvider(): array
     {
         return [
-            'BINARY without length' => [
-                'BINARY',
-                BinaryDataType::class,
+            'CHAR without length' => [
+                'CHAR',
+                CharDataType::class,
                 0,
             ],
-            'BINARY with length' => [
-                'BINARY(200)',
-                BinaryDataType::class,
+            'CHAR with length' => [
+                'CHAR(200)',
+                CharDataType::class,
                 200,
             ],
-            'VARBINARY without length' => [
-                'VARBINARY',
-                VarBinaryDataType::class,
+            'VARCHAR without length' => [
+                'VARCHAR',
+                VarCharDataType::class,
                 0,
             ],
-            'VARBINARY with length' => [
-                'VARBINARY(200)',
-                VarBinaryDataType::class,
+            'VARCHAR with length' => [
+                'VARCHAR(200)',
+                VarCharDataType::class,
                 200,
             ],
         ];

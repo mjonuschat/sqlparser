@@ -16,7 +16,11 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\BigIntDataType;
+use MojoCode\SqlParser\AST\DataType\IntegerDataType;
+use MojoCode\SqlParser\AST\DataType\MediumIntDataType;
+use MojoCode\SqlParser\AST\DataType\SmallIntDataType;
+use MojoCode\SqlParser\AST\DataType\TinyIntDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 /**
@@ -35,27 +39,33 @@ class IntegerTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'TINYINT without length' => [
                 'TINYINT',
-                null,
+                TinyIntDataType::class,
+                0,
             ],
             'SMALLINT without length' => [
                 'SMALLINT',
-                null,
+                SmallIntDataType::class,
+                0,
             ],
             'MEDIUMINT without length' => [
                 'MEDIUMINT',
-                null,
+                MediumIntDataType::class,
+                0,
             ],
             'INT without length' => [
                 'INT',
-                null,
+                IntegerDataType::class,
+                0,
             ],
             'INTEGER without length' => [
                 'INTEGER',
-                null,
+                IntegerDataType::class,
+                0,
             ],
             'BIGINT without length' => [
                 'BIGINT',
-                null,
+                BigIntDataType::class,
+                0,
             ],
             // MySQL supports an extension for optionally specifying the display width of integer data types
             // in parentheses following the base keyword for the type. For example, INT(4) specifies an INT
@@ -63,27 +73,33 @@ class IntegerTypesTestAbstract extends AbstractDataTypeBaseTestCase
             // The display width does not constrain the range of values that can be stored in the column.
             'TINYINT with length' => [
                 'TINYINT(4)',
-                null,
+                TinyIntDataType::class,
+                4,
             ],
             'SMALLINT with length' => [
                 'SMALLINT(6)',
-                null,
+                SmallIntDataType::class,
+                6,
             ],
             'MEDIUMINT with length' => [
                 'MEDIUMINT(8)',
-                null,
+                MediumIntDataType::class,
+                8,
             ],
             'INT with length' => [
                 'INT(11)',
-                null,
+                IntegerDataType::class,
+                11,
             ],
             'INTEGER with length' => [
                 'INTEGER(11)',
-                null,
+                IntegerDataType::class,
+                11,
             ],
             'BIGINT with length' => [
                 'BIGINT(20)',
-                null,
+                BigIntDataType::class,
+                20,
             ],
         ];
     }
@@ -92,11 +108,14 @@ class IntegerTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseIntegerDataTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param int $length
      */
-    public function canParseIntegerDataType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className, int $length)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+        $this->assertSame($length, $subject->dataType->length);
     }
 }

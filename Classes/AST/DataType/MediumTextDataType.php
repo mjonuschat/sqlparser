@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class MediumTextDataType extends AbstractDataType
 {
-
     /**
      * MediumTextDataType constructor.
      *

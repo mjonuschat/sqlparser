@@ -16,7 +16,7 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\EnumDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 class EnumAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
@@ -31,15 +31,18 @@ class EnumAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
         return [
             'ENUM(value)' => [
                 "ENUM('value1')",
-                null,
+                EnumDataType::class,
+                ['value1'],
             ],
             'ENUM(value,value)' => [
                 "ENUM('value1','value2')",
-                null,
+                EnumDataType::class,
+                ['value1', 'value2'],
             ],
             'ENUM(value, value)' => [
                 "ENUM('value1', 'value2')",
-                null,
+                EnumDataType::class,
+                ['value1', 'value2'],
             ],
         ];
     }
@@ -48,11 +51,14 @@ class EnumAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseEnumDataTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param array $values
      */
-    public function canParseEnumDataType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className, array $values)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+        $this->assertSame($values, $subject->dataType->values);
     }
 }

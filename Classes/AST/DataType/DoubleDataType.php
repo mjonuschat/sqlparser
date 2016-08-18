@@ -18,6 +18,20 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class DoubleDataType extends AbstractDataType
 {
+    /**
+     * @var int
+     */
+    public $precision;
+
+    /**
+     * @var int
+     */
+    public $scale;
+
+    /**
+     * @var array
+     */
+    public $options;
 
     /**
      * DoubleDataType constructor.
@@ -27,5 +41,8 @@ class DoubleDataType extends AbstractDataType
      */
     public function __construct(array $dataTypeDecimals, array $dataTypeOptions)
     {
+        $this->precision = $dataTypeDecimals['length'] ?? null;
+        $this->scale = $dataTypeDecimals['decimals'] ?? null;
+        $this->options = $dataTypeOptions;
     }
 }

@@ -16,7 +16,10 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\BlobDataType;
+use MojoCode\SqlParser\AST\DataType\LongBlobDataType;
+use MojoCode\SqlParser\AST\DataType\MediumBlobDataType;
+use MojoCode\SqlParser\AST\DataType\TinyBlobDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 /**
@@ -35,19 +38,19 @@ class BlobTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'TINYBLOB' => [
                 'TINYBLOB',
-                null,
+                TinyBlobDataType::class,
             ],
             'BLOB' => [
                 'BLOB',
-                null,
+                BlobDataType::class,
             ],
             'MEDIUMBLOB' => [
                 'MEDIUMBLOB',
-                null,
+                MediumBlobDataType::class,
             ],
             'LONGBLOB' => [
                 'LONGBLOB',
-                null,
+                LongBlobDataType::class,
             ],
         ];
     }
@@ -56,11 +59,12 @@ class BlobTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseBlobDataTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
      */
-    public function canParseBlobDataType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
     }
 }

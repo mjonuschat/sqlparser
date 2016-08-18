@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class JsonDataType extends AbstractDataType
 {
-
     /**
      * JsonDataType constructor.
      */

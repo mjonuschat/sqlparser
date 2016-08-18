@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class TextDataType extends AbstractDataType
 {
-
     /**
      * TextDataType constructor.
      *

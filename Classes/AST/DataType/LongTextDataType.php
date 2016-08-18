@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class LongTextDataType extends AbstractDataType
 {
-
     /**
      * LongTextDataType constructor.
      *

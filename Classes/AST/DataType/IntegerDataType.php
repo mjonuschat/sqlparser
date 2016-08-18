@@ -18,14 +18,25 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class IntegerDataType extends AbstractDataType
 {
+    /**
+     * @var int
+     */
+    public $length;
+
+    /**
+     * @var array
+     */
+    public $options;
 
     /**
      * IntegerDataType constructor.
      *
-     * @param $dataTypeLength
-     * @param array $dataTypeOptions
+     * @param $length
+     * @param array $options
      */
-    public function __construct($dataTypeLength, array $dataTypeOptions)
+    public function __construct(int $length, array $options)
     {
+        $this->length = $length;
+        $this->options = $options;
     }
 }

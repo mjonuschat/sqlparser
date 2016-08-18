@@ -18,13 +18,18 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class BitDataType extends AbstractDataType
 {
+    /**
+     * @var int
+     */
+    public $length;
 
     /**
      * BitDataType constructor.
      *
-     * @param $dataTypeLength
+     * @param int $length
      */
-    public function __construct($dataTypeLength)
+    public function __construct(int $length)
     {
+        $this->length = $length;
     }
 }

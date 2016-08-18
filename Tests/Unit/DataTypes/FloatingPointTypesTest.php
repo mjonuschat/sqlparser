@@ -16,7 +16,9 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\DoubleDataType;
+use MojoCode\SqlParser\AST\DataType\FloatDataType;
+use MojoCode\SqlParser\AST\DataType\RealDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 /**
@@ -34,39 +36,57 @@ class FloatingPointTypesTestAbstract extends AbstractDataTypeBaseTestCase
         return [
             'FLOAT without precision' => [
                 'FLOAT',
+                FloatDataType::class,
+                null,
                 null,
             ],
             'FLOAT with precision' => [
                 'FLOAT(44)',
+                FloatDataType::class,
+                44,
                 null,
             ],
             'FLOAT with precision and decimals' => [
                 'FLOAT(44,5)',
-                null,
+                FloatDataType::class,
+                44,
+                5,
             ],
             'REAL without precision' => [
                 'REAL',
+                RealDataType::class,
+                null,
                 null,
             ],
             'REAL with precision' => [
                 'REAL(44)',
+                RealDataType::class,
+                44,
                 null,
             ],
             'REAL with precision and decimals' => [
                 'REAL(44,5)',
-                null,
+                RealDataType::class,
+                44,
+                5,
             ],
             'DOUBLE without precision' => [
                 'DOUBLE',
+                DoubleDataType::class,
+                null,
                 null,
             ],
             'DOUBLE with precision' => [
                 'DOUBLE(44)',
+                DoubleDataType::class,
+                44,
                 null,
             ],
             'DOUBLE with precision and decimals' => [
                 'DOUBLE(44,5)',
-                null,
+                DoubleDataType::class,
+                44,
+                5,
             ],
         ];
     }
@@ -75,11 +95,20 @@ class FloatingPointTypesTestAbstract extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseFloatingPointTypesProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param int $precision
+     * @param int $scale
      */
-    public function canParseFloatingPointTypes(string $columnDefinition, $expectedResult)
-    {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+    public function canParseDataType(
+        string $columnDefinition,
+        string $className,
+        int $precision = null,
+        int $scale = null
+    ) {
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+        $this->assertSame($precision, $subject->dataType->precision);
+        $this->assertSame($scale, $subject->dataType->scale);
     }
 }

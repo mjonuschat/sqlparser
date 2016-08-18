@@ -18,14 +18,24 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class CharDataType extends AbstractDataType
 {
+    /**
+     * @var int
+     */
+    public $length;
+    /**
+     * @var array
+     */
+    public $options;
 
     /**
      * CharDataType constructor.
      *
-     * @param int $dataTypeLength
-     * @param array $characterDataTypeOptions
+     * @param int $length
+     * @param array $options
      */
-    public function __construct($dataTypeLength, array $characterDataTypeOptions)
+    public function __construct(int $length, array $options)
     {
+        $this->length = $length;
+        $this->options = $options;
     }
 }

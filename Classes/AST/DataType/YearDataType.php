@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class YearDataType extends AbstractDataType
 {
-
     /**
      * YearDataType constructor.
      */

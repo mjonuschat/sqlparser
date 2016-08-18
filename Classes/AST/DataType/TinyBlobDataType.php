@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class TinyBlobDataType extends AbstractDataType
 {
-
     /**
      * TinyBlobDataType constructor.
      */

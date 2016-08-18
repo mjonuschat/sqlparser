@@ -18,14 +18,25 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class EnumDataType extends AbstractDataType
 {
+    /**
+     * @var array
+     */
+    public $values;
+
+    /**
+     * @var array
+     */
+    public $options;
 
     /**
      * EnumDataType constructor.
      *
-     * @param array $valueList
-     * @param array $enumerationDataTypeOptions
+     * @param array $values
+     * @param array $options
      */
-    public function __construct($valueList, $enumerationDataTypeOptions)
+    public function __construct(array $values, array $options)
     {
+        $this->values = $values;
+        $this->options = $options;
     }
 }

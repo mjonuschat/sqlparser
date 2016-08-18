@@ -16,7 +16,7 @@ namespace MojoCode\SqlParser\Tests\Unit\DataTypes;
  * The TYPO3 project - inspiring people to share!
  */
 
-use MojoCode\SqlParser\Parser;
+use MojoCode\SqlParser\AST\DataType\BitDataType;
 use MojoCode\SqlParser\Tests\Unit\AbstractDataTypeBaseTestCase;
 
 class BitAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
@@ -31,11 +31,13 @@ class BitAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
         return [
             'BIT without length' => [
                 'BIT',
-                null,
+                BitDataType::class,
+                0,
             ],
             'BIT with length' => [
                 'BIT(8)',
-                null,
+                BitDataType::class,
+                8,
             ],
         ];
     }
@@ -44,11 +46,14 @@ class BitAbstractDataTypeTest extends AbstractDataTypeBaseTestCase
      * @test
      * @dataProvider canParseBitDataTypeProvider
      * @param string $columnDefinition
-     * @param mixed $expectedResult
+     * @param string $className
+     * @param int $length
      */
-    public function canParseBitDataType(string $columnDefinition, $expectedResult)
+    public function canParseDataType(string $columnDefinition, string $className, int $length)
     {
-        $subject = new Parser($this->createTableStatement($columnDefinition));
-        $subject->parse();
+        $subject = $this->createSubject($columnDefinition);
+
+        $this->assertInstanceOf($className, $subject->dataType);
+        $this->assertSame($length, $subject->dataType->length);
     }
 }

@@ -18,7 +18,6 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class BlobDataType extends AbstractDataType
 {
-
     /**
      * BlobDataType constructor.
      */

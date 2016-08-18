@@ -18,13 +18,20 @@ namespace MojoCode\SqlParser\AST\DataType;
 
 class DateTimeDataType extends AbstractDataType
 {
+    /**
+     * Fractional seconds part
+     *
+     * @var int
+     */
+    public $length;
 
     /**
      * DateTimeDataType constructor.
      *
-     * @param int $fractionalSecondsPart
+     * @param int $length
      */
-    public function __construct($fractionalSecondsPart)
+    public function __construct(int $length)
     {
+        $this->length = $length;
     }
 }

@@ -16,6 +16,8 @@ namespace MojoCode\SqlParser\Tests\Unit;
  * The TYPO3 project - inspiring people to share!
  */
 
+use MojoCode\SqlParser\AST\CreateColumnDefinitionItem;
+use MojoCode\SqlParser\Parser;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractDataTypeBaseTestCase extends TestCase
@@ -34,5 +36,19 @@ abstract class AbstractDataTypeBaseTestCase extends TestCase
     protected function createTableStatement(string $columnDefinition): string
     {
         return sprintf(static::CREATE_TABLE_STATEMENT, $columnDefinition);
+    }
+
+    /**
+     * Parse the CREATE TABLE statement and return the reference definition
+     *
+     * @param string $statement
+     * @return \MojoCode\SqlParser\AST\CreateColumnDefinitionItem
+     */
+    protected function createSubject(string $statement): CreateColumnDefinitionItem
+    {
+        $parser = new Parser($this->createTableStatement($statement));
+        $createTableStatement = $parser->parse()[0];
+
+        return $createTableStatement->createDefinition->items[0];
     }
 }
