@@ -400,6 +400,9 @@ class Parser
             case Lexer::T_INDEX:
                 $definitionItem = $this->createIndexDefinitionItem();
                 break;
+            case Lexer::T_FOREIGN:
+                $definitionItem = $this->createForeignKeyDefinitionItem();
+                break;
             case Lexer::T_CONSTRAINT:
                 $this->semanticalError('CONSTRAINT [symbol] index definition part not supported');
                 break;
@@ -503,6 +506,40 @@ class Parser
         $indexDefinition->options = $this->indexOptions();
 
         return $indexDefinition;
+    }
+
+    /**
+     * Parses an foreign key definition item contained in the create definition
+     *
+     * @return \MojoCode\SqlParser\AST\CreateForeignKeyDefinitionItem
+     * @throws \MojoCode\SqlParser\StatementException
+     */
+    protected function createForeignKeyDefinitionItem(): AST\CreateForeignKeyDefinitionItem
+    {
+        $this->match(Lexer::T_FOREIGN);
+        $this->match(Lexer::T_KEY);
+
+        $indexName = $this->indexName();
+
+        $this->match(Lexer::T_OPEN_PARENTHESIS);
+
+        $indexColumns = [];
+        $indexColumns[] = $this->indexColumnName();
+
+        while ($this->lexer->isNextToken(Lexer::T_COMMA)) {
+            $this->match(Lexer::T_COMMA);
+            $indexColumns[] = $this->indexColumnName();
+        }
+
+        $this->match(Lexer::T_CLOSE_PARENTHESIS);
+
+        $foreignKeyDefinition = new AST\CreateForeignKeyDefinitionItem(
+            $indexName,
+            $indexColumns,
+            $this->referenceDefinition()
+        );
+
+        return $foreignKeyDefinition;
     }
 
     /**

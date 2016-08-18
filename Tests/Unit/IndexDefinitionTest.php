@@ -188,6 +188,19 @@ class IndexDefinitionTest extends TestCase
                 'SPATIAL KEY (aField, bField(240))',
                 null
             ],
+            // See ReferenceDefinitionTest for actual reference definition parsing tests
+            'FOREIGN KEY (single column)' => [
+                'FOREIGN KEY (`aField`) REFERENCES `bTable` (`bField`)',
+                null
+            ],
+            'FOREIGN KEY (multiple columns)' => [
+                'FOREIGN KEY (`aField`, `bField`) REFERENCES `bTable` (`cField`, `dField`)',
+                null
+            ],
+            'FOREIGN KEY (index name)' => [
+                'FOREIGN KEY `aIndex`(`aField`, `bField`) REFERENCES `bTable` (`cField`, `dField`)',
+                null
+            ],
         ];
     }
 

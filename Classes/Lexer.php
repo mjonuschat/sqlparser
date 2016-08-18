@@ -129,6 +129,7 @@ class Lexer extends \Doctrine\Common\Lexer
     const T_KEY_BLOCK_SIZE = 346;
     const T_WITH = 347;
     const T_PARSER = 348;
+    const T_FOREIGN = 349;
 
     /**
      * Creates a new statement scanner object.
