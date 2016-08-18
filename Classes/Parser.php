@@ -1323,7 +1323,7 @@ class Parser
     {
         $schemaObjectName = null;
 
-        if ($this->lexer->isNextToken(Lexer::T_IDENTIFIER)) {
+        if ($this->lexer->isNextTokenAny([Lexer::T_IDENTIFIER, Lexer::T_STRING])) {
             $schemaObjectName = $this->lexer->lookahead['value'];
         }
         $this->match(Lexer::T_IDENTIFIER);
