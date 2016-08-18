@@ -33,7 +33,7 @@ class CreateForeignKeyDefinitionItem extends AbstractCreateDefinitionItem
     /**
      * @var IndexColumnName[]
      */
-    public $columns = [];
+    public $columnNames = [];
 
     /**
      * Reference definition
@@ -46,13 +46,13 @@ class CreateForeignKeyDefinitionItem extends AbstractCreateDefinitionItem
      * CreateForeignKeyDefinitionItem constructor.
      *
      * @param \MojoCode\SqlParser\AST\Identifier $indexName
-     * @param array $columns
+     * @param array $columnNames
      * @param \MojoCode\SqlParser\AST\ReferenceDefinition $reference
      */
-    public function __construct(Identifier $indexName, array $columns, ReferenceDefinition $reference)
+    public function __construct(Identifier $indexName, array $columnNames, ReferenceDefinition $reference)
     {
         $this->indexName = $indexName;
-        $this->columns = $columns;
+        $this->columnNames = $columnNames;
         $this->reference = $reference;
     }
 }

@@ -68,7 +68,7 @@ class CreateIndexDefinitionItem extends AbstractCreateDefinitionItem
     /**
      * @var IndexColumnName[]
      */
-    public $columns = [];
+    public $columnNames = [];
 
     /**
      * Index options KEY_BLOCK_SIZE, USING, WITH PARSER or COMMENT

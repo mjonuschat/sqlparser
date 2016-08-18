@@ -494,11 +494,11 @@ class Parser
 
         $this->match(Lexer::T_OPEN_PARENTHESIS);
 
-        $indexDefinition->columns[] = $this->indexColumnName();
+        $indexDefinition->columnNames[] = $this->indexColumnName();
 
         while ($this->lexer->isNextToken(Lexer::T_COMMA)) {
             $this->match(Lexer::T_COMMA);
-            $indexDefinition->columns[] = $this->indexColumnName();
+            $indexDefinition->columnNames[] = $this->indexColumnName();
         }
 
         $this->match(Lexer::T_CLOSE_PARENTHESIS);

@@ -16,190 +16,498 @@ namespace MojoCode\SqlParser\Tests\Unit;
  * The TYPO3 project - inspiring people to share!
  */
 
+use MojoCode\SqlParser\AST\CreateIndexDefinitionItem;
+use MojoCode\SqlParser\AST\Identifier;
 use MojoCode\SqlParser\Parser;
 use PHPUnit\Framework\TestCase;
 
 class IndexDefinitionTest extends TestCase
 {
+    /**
+     * Each parameter array consists of the following values:
+     *  - index definition SQL fragment
+     *  - expected index name
+     *  - array of index column definitions [name, length, direction]
+     *  - isPrimary
+     *  - isUnique
+     *  - isFulltext
+     *  - isSpatial
+     *  - indexType
+     *  - options array
+     *
+     * @return array
+     */
     public function canParseIndexDefinitionDataProvider(): array
     {
         return [
             'PRIMARY KEY (single column)' => [
                 'PRIMARY KEY (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                true,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'PRIMARY KEY (multiple columns)' => [
                 'PRIMARY KEY (`aField`, `bField`(199), cField)',
-                null
+                '',
+                [['aField', 0, null], ['bField', 199, null], ['cField', 0, null]],
+                true,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'PRIMARY KEY (index type)' => [
                 'PRIMARY KEY USING HASH (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                true,
+                false,
+                false,
+                false,
+                'HASH',
+                [],
             ],
             'PRIMARY KEY (index options)' => [
                 "PRIMARY KEY (`aField`, bField(199)) KEY_BLOCK_SIZE 4 WITH PARSER `something` COMMENT 'aTest'",
-                null
+                '',
+                [['aField', 0, null], ['bField', 199, null]],
+                true,
+                false,
+                false,
+                false,
+                '',
+                [
+                    'key_block_size' => 4,
+                    'parser' => new Identifier('something'),
+                    'comment' => 'aTest',
+                ],
             ],
             'PRIMARY KEY (all parts)' => [
                 "PRIMARY KEY USING BTREE (`aField`, bField(199)) KEY_BLOCK_SIZE 4 COMMENT 'aTest'",
-                null
+                '',
+                [['aField', 0, null], ['bField', 199, null]],
+                true,
+                false,
+                false,
+                false,
+                'BTREE',
+                [
+                    'key_block_size' => 4,
+                    'comment' => 'aTest',
+                ],
             ],
             'INDEX (single column)' => [
                 'INDEX (`aField`(24))',
-                null
+                '',
+                [['aField', 24, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'INDEX (multiple columns)' => [
                 'INDEX (`aField`(24), bField)',
-                null
+                '',
+                [['aField', 24, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'INDEX (index name)' => [
                 'INDEX aIndex (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'INDEX (index type)' => [
                 'INDEX USING HASH (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                'HASH',
+                [],
             ],
             'INDEX (index name & type)' => [
                 'INDEX `aIndex` USING BTREE (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                'BTREE',
+                [],
             ],
             'INDEX (all parts)' => [
                 "INDEX `aIndex` USING BTREE (`aField`) COMMENT 'aComment'",
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                'BTREE',
+                [
+                    'comment' => 'aComment',
+                ],
             ],
             'KEY (single column)' => [
                 'KEY (`aField`(24))',
-                null
+                '',
+                [['aField', 24, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'KEY (multiple columns)' => [
                 'KEY (`aField`(24), bField)',
-                null
+                '',
+                [['aField', 24, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'KEY (index name)' => [
                 'KEY aIndex (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                '',
+                [],
             ],
             'KEY (index type)' => [
                 'KEY USING BTREE (aField(96))',
-                null
+                '',
+                [['aField', 96, null]],
+                false,
+                false,
+                false,
+                false,
+                'BTREE',
+                [],
             ],
             'KEY (index name & type)' => [
                 'KEY `aIndex` USING HASH (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                'HASH',
+                [],
             ],
             'KEY (all parts)' => [
                 'KEY `aIndex` USING HASH (`aField`) WITH PARSER aParser',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                false,
+                'HASH',
+                [
+                    'parser' => new Identifier('aParser'),
+                ],
             ],
             'UNIQUE (single column)' => [
                 'UNIQUE (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                '',
+                [],
             ],
             'UNIQUE (multiple columns)' => [
                 'UNIQUE (`aField`, bField, cField(40))',
-                null
+                '',
+                [['aField', 0, null], ['bField', 0, null], ['cField', 40, null]],
+                false,
+                true,
+                false,
+                false,
+                '',
+                [],
             ],
             'UNIQUE INDEX (single column)' => [
                 'UNIQUE INDEX (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                '',
+                [],
             ],
             'UNIQUE KEY (multiple columns)' => [
                 'UNIQUE KEY (`aField`, bField, cField(40))',
-                null
+                '',
+                [['aField', 0, null], ['bField', 0, null], ['cField', 40, null]],
+                false,
+                true,
+                false,
+                false,
+                '',
+                [],
             ],
             'UNIQUE (index name)' => [
                 'UNIQUE aIndex (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                '',
+                [],
             ],
             'UNIQUE (index type)' => [
                 'UNIQUE USING BTREE (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                'BTREE',
+                [],
             ],
             'UNIQUE (index name & type)' => [
                 'UNIQUE `aIndex` USING BTREE (`aField`)',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                'BTREE',
+                [],
             ],
             'UNIQUE (all parts)' => [
                 'UNIQUE `aIndex` USING BTREE (`aField`) KEY_BLOCK_SIZE = 24',
-                null
+                'aIndex',
+                [['aField', 0, null]],
+                false,
+                true,
+                false,
+                false,
+                'BTREE',
+                [
+                    'key_block_size' => 24,
+                ],
             ],
             'FULLTEXT (single column)' => [
                 'FULLTEXT (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT (multiple columns)' => [
                 'FULLTEXT (`aField`, `bField`)',
-                null
+                '',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT (index name)' => [
                 'FULLTEXT aIndex (`aField`, `bField`)',
-                null
+                'aIndex',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT (all parts)' => [
                 "FULLTEXT `aIndex` (`aField`, `bField`) COMMENT 'aComment'",
-                null
+                'aIndex',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [
+                    'comment' => 'aComment',
+                ],
             ],
             'FULLTEXT INDEX (single column)' => [
                 'FULLTEXT INDEX (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT INDEX (multiple columns)' => [
                 'FULLTEXT INDEX (`aField`, bField(19))',
-                null
+                '',
+                [['aField', 0, null], ['bField', 19, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT KEY (single column)' => [
                 'FULLTEXT KEY (aField(20))',
-                null
+                '',
+                [['aField', 20, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'FULLTEXT KEY (multiple columns)' => [
                 'FULLTEXT KEY (aField(20), `bField`)',
-                null
+                '',
+                [['aField', 20, null], ['bField', 0, null]],
+                false,
+                false,
+                true,
+                false,
+                '',
+                [],
             ],
             'SPATIAL (single column)' => [
                 'SPATIAL (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL (multiple columns)' => [
                 'SPATIAL (`aField`, `bField`)',
-                null
+                '',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL (index name)' => [
                 'SPATIAL `aIndex` (`aField`, `bField`)',
-                null
+                'aIndex',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL (all parts)' => [
                 "SPATIAL `aIndex` (`aField`, `bField`) WITH PARSER aParser COMMENT 'aComment'",
-                null
+                'aIndex',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [
+                    'parser' => new Identifier('aParser'),
+                    'comment' => 'aComment',
+                ],
             ],
             'SPATIAL INDEX (single column)' => [
                 'SPATIAL INDEX (`aField`)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL INDEX (multiple columns)' => [
                 'SPATIAL INDEX (aField, bField)',
-                null
+                '',
+                [['aField', 0, null], ['bField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL KEY (single column)' => [
                 'SPATIAL KEY (aField)',
-                null
+                '',
+                [['aField', 0, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
             'SPATIAL KEY (multiple columns)' => [
                 'SPATIAL KEY (aField, bField(240))',
-                null
-            ],
-            // See ReferenceDefinitionTest for actual reference definition parsing tests
-            'FOREIGN KEY (single column)' => [
-                'FOREIGN KEY (`aField`) REFERENCES `bTable` (`bField`)',
-                null
-            ],
-            'FOREIGN KEY (multiple columns)' => [
-                'FOREIGN KEY (`aField`, `bField`) REFERENCES `bTable` (`cField`, `dField`)',
-                null
-            ],
-            'FOREIGN KEY (index name)' => [
-                'FOREIGN KEY `aIndex`(`aField`, `bField`) REFERENCES `bTable` (`cField`, `dField`)',
-                null
+                '',
+                [['aField', 0, null], ['bField', 240, null]],
+                false,
+                false,
+                false,
+                true,
+                '',
+                [],
             ],
         ];
     }
@@ -209,10 +517,47 @@ class IndexDefinitionTest extends TestCase
      * @dataProvider canParseIndexDefinitionDataProvider
      * @param string $indexDefinition
      */
-    public function canParseIndexDefinition(string $indexDefinition, $expectedResult)
-    {
+    public function canParseIndexDefinition(
+        string $indexDefinition,
+        string $indexName,
+        array $indexColumns,
+        bool $isPrimary,
+        bool $isUnique,
+        bool $isFulltext,
+        bool $isSpatial,
+        string $indexType,
+        array $indexOptions
+    ) {
         $statement = sprintf('CREATE TABLE `aTable`(`aField` INT(11), %s)', $indexDefinition);
-        $subject = new Parser($statement);
-        $subject->parse();
+        $subject = $this->createSubject($statement);
+
+        $this->assertInstanceOf(CreateIndexDefinitionItem::class, $subject);
+        $this->assertSame($indexName, $subject->indexName->schemaObjectName);
+        $this->assertSame($isPrimary, $subject->isPrimary);
+        $this->assertSame($isUnique, $subject->isUnique);
+        $this->assertSame($isFulltext, $subject->isFulltext);
+        $this->assertSame($isSpatial, $subject->isSpatial);
+        $this->assertSame($indexType, $subject->indexType);
+        $this->assertEquals($indexOptions, $subject->options);
+
+        foreach ($indexColumns as $index => $column) {
+            $this->assertSame($column[0], $subject->columnNames[$index]->columnName->schemaObjectName);
+            $this->assertSame($column[1], $subject->columnNames[$index]->length);
+            $this->assertSame($column[2], $subject->columnNames[$index]->direction);
+        }
+    }
+
+    /**
+     * Parse the CREATE TABLE statement and return the reference definition
+     *
+     * @param string $statement
+     * @return \MojoCode\SqlParser\AST\CreateIndexDefinitionItem
+     */
+    protected function createSubject(string $statement): CreateIndexDefinitionItem
+    {
+        $parser = new Parser($statement);
+        $createTableStatement = $parser->parse()[0];
+
+        return $createTableStatement->createDefinition->items[1];
     }
 }
